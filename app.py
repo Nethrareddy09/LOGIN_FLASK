@@ -5,11 +5,16 @@ import re
 from flask_mail import Mail, Message
 from random import *
 import os
+from dotenv import load_dotenv
 
+current_directory = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(current_directory, '.env')
+load_dotenv(dotenv_path)
 
 # initialize first flask
 app = Flask(__name__)
 mail = Mail(app)
+
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -20,6 +25,11 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 otp=randint(000000,999999)
 
+print(os.environ.get('MAIL_USERNAME'))
+print(os.environ.get('MAIL_PASSWORD'))
+
+
+
 def db_connection():
   connection = mysql.connector.connect(
   host="mysql-1ed7bbbc-wlmycn-2bde.aivencloud.com",
@@ -29,7 +39,7 @@ def db_connection():
   database="defaultdb")
   return connection
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/', methods=['GET','POST'])
 def login():
 	if request.method == 'GET':
 		return render_template('login.html',message="")
@@ -77,7 +87,9 @@ def register():
 					connection_cursor.close()
 					connection.close()
 					message='Registration successful.....'
-					msg = Message(subject='OTP',sender ='nethra325reddy@gmail.com',recipients = [email] )
+					username=os.environ.get('MAIL_USERNAME')
+					print(username)
+					msg = Message(subject='OTP',sender=username,recipients = [email] )
 					msg.body = str(otp)
 					mail.send(msg)
 					return render_template('verify.html')
@@ -89,7 +101,7 @@ def register():
 def validate():
 	user_otp=request.form['otp']
 	if otp==int(user_otp):
-		return render_template('register.html')
+		return redirect(url_for('register.html'))
 
 if __name__=="__main__":
 	app.run(debug= True)
