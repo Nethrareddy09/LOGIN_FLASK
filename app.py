@@ -6,6 +6,7 @@ from flask_mail import Mail, Message
 from random import *
 import os
 
+
 # initialize first flask
 app = Flask(__name__)
 mail = Mail(app)
@@ -75,7 +76,7 @@ def register():
 					connection.commit()
 					connection_cursor.close()
 					connection.close()
-					message='Registration successful'
+					message='Registration successful.....'
 					msg = Message(subject='OTP',sender ='nethra325reddy@gmail.com',recipients = [email] )
 					msg.body = str(otp)
 					mail.send(msg)
